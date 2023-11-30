@@ -10,5 +10,7 @@ namespace DevagramCShrap.Repository
         public bool VerificarEmail(string email);
 
         Usuario GetUsuarioPorId(int id);
+
+        public void AtualizarUsuario (Usuario usuario);
     }
 }

@@ -67,3 +67,4 @@ C:\Users\paulo\projetos_devaria\DevagramCShrap\DevagramCShrap\bin\Debug\net6.0\r
 C:\Users\paulo\projetos_devaria\DevagramCShrap\DevagramCShrap\bin\Debug\net6.0\runtimes\win\lib\netcoreapp3.0\System.Windows.Extensions.dll
 C:\Users\paulo\projetos_devaria\DevagramCShrap\DevagramCShrap\bin\Debug\net6.0\Humanizer.dll
 C:\Users\paulo\projetos_devaria\DevagramCShrap\DevagramCShrap\bin\Debug\net6.0\Microsoft.EntityFrameworkCore.Design.dll
+C:\Users\paulo\projetos_devaria\DevagramCShrap\DevagramCShrap\obj\Debug\net6.0\DevagramCShrap.sourcelink.json
