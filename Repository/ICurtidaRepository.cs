@@ -7,5 +7,6 @@ namespace DevagramCShrap.Repository
         public void Curtir(Curtida curtida);
         public void Descurtir(Curtida curtida);
         public Curtida GetCurtida(int idPubicacao, int idUsuario);
+        List<Curtida> GetCurtidaPorPublicacao(int idPublicacao);
     }
 }

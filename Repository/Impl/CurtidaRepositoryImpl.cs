@@ -27,5 +27,10 @@ namespace DevagramCShrap.Repository.Impl
         {
             return _context.Curtidas.FirstOrDefault(c => c.IdPublicacao == idPubicacao && c.IdUsuario == idUsuario);
         }
+
+        public List<Curtida> GetCurtidaPorPublicacao(int idPublicacao)
+        {
+            return _context.Curtidas.Where(c => c.IdPublicacao == idPublicacao).ToList();
+        }
     }
 }
