@@ -12,5 +12,6 @@ namespace DevagramCShrap.Repository
         Usuario GetUsuarioPorId(int id);
 
         public void AtualizarUsuario (Usuario usuario);
+        List<Usuario> GetUsuarioPorNome(string nome);
     }
 }

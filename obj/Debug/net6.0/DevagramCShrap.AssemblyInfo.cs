@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DevagramCShrap")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+74b874b8ca5da24f45abaff89ceeff552b4baf27")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+270295a3f010553d68f3e694230cfe4abf87e193")]
 [assembly: System.Reflection.AssemblyProductAttribute("DevagramCShrap")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DevagramCShrap")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

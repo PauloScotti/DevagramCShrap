@@ -4,6 +4,7 @@ using DevagramCShrap.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DevagramCShrap.Migrations
 {
     [DbContext(typeof(DevagramContext))]
-    partial class DevagramContextModelSnapshot : ModelSnapshot
+    [Migration("20231204134907_DatasComentarioPublicacoesAdd")]
+    partial class DatasComentarioPublicacoesAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -73,29 +75,6 @@ namespace DevagramCShrap.Migrations
                     b.HasIndex("IdUsuario");
 
                     b.ToTable("Curtidas");
-                });
-
-            modelBuilder.Entity("DevagramCShrap.Models.Favoritar", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("IdPublicacao")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdUsuario")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdPublicacao");
-
-                    b.HasIndex("IdUsuario");
-
-                    b.ToTable("Favoritar");
                 });
 
             modelBuilder.Entity("DevagramCShrap.Models.Publicacao", b =>
@@ -199,25 +178,6 @@ namespace DevagramCShrap.Migrations
                 });
 
             modelBuilder.Entity("DevagramCShrap.Models.Curtida", b =>
-                {
-                    b.HasOne("DevagramCShrap.Models.Publicacao", "Publicacao")
-                        .WithMany()
-                        .HasForeignKey("IdPublicacao")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DevagramCShrap.Models.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("IdUsuario")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Publicacao");
-
-                    b.Navigation("Usuario");
-                });
-
-            modelBuilder.Entity("DevagramCShrap.Models.Favoritar", b =>
                 {
                     b.HasOne("DevagramCShrap.Models.Publicacao", "Publicacao")
                         .WithMany()

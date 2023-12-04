@@ -28,6 +28,11 @@ namespace DevagramCShrap.Repository.Impl
             return _context.Usuarios.FirstOrDefault(u => u.Email == email && u.Senha == senha);
         }
 
+        public List<Usuario> GetUsuarioPorNome(string nome)
+        {
+            return _context.Usuarios.Where(u => u.Nome.Contains(nome)).ToList();
+        }
+
         public void Salvar(Usuario usuario)
         {
             _context.Add(usuario);

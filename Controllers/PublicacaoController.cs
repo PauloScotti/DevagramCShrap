@@ -51,7 +51,8 @@ namespace DevagramCShrap.Controllers
                     {
                         Descricao = publicacaoDto.Descricao,
                         IdUsuario = usuario.Id,
-                        Foto = cosmicService.EnviarImagem(new ImagemDto { Imagem = publicacaoDto.Foto, Nome = "publicacao" })
+                        DataPublicacao = DateTime.Now,
+                        Foto = cosmicService.EnviarImagem(new ImagemDto { Imagem = publicacaoDto.Foto, Nome = publicacaoDto.Foto.FileName })
                     };
                     _publicacaoRepository.Publicar(publicacao);
                 }
@@ -141,6 +142,70 @@ namespace DevagramCShrap.Controllers
             catch (Exception ex)
             {
                 _logger.LogError("Ocorreu um erro ao carregar o feed do usuário");
+                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
+                {
+                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
+
+        [HttpGet]
+        [Route("publicacaoId")]
+        public IActionResult PublicacaoId(int idPublicacao)
+        {
+            try
+            {
+                return Ok(_publicacaoRepository.getQtdePublicacaoId(idPublicacao));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Ocorreu um erro ao buscar a publicação");
+                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
+                {
+                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
+
+        [HttpPost]
+        [Route("compartilhar")]
+        public IActionResult CompartilharPublicacao(int idPublicacao)
+        {
+            try
+            {
+                Usuario usuario = LerToken();
+                var publicacaoASerCompartilhada = _publicacaoRepository.getQtdePublicacaoId(idPublicacao);
+
+                if (publicacaoASerCompartilhada != null)
+                {
+                    if (String.IsNullOrEmpty(publicacaoASerCompartilhada.Descricao)
+                        && String.IsNullOrWhiteSpace(publicacaoASerCompartilhada.Descricao))
+                    {
+                        _logger.LogError("A descrição está inválida");
+                        return BadRequest("É obrigatório incluir a descrição na publicação");
+                    }
+                    if (publicacaoASerCompartilhada.Foto == null)
+                    {
+                        _logger.LogError("A foto está inválida");
+                        return BadRequest("É obrigatório incluir a foto na publicação");
+                    }
+                    Publicacao publicacao = new Publicacao()
+                    {
+                        Descricao = publicacaoASerCompartilhada.Descricao,
+                        IdUsuario = usuario.Id,
+                        DataPublicacao = DateTime.Now,
+                        Foto = publicacaoASerCompartilhada.Foto
+                    };
+                    _publicacaoRepository.Publicar(publicacao);
+                }
+
+                return Ok("Publicação compartilhada com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Ocorreu um erro ao criar publicação");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
                     Descricao = "Ocorreu o seguinte erro: " + ex.Message,

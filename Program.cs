@@ -24,6 +24,7 @@ builder.Services.AddScoped<ISeguidorRepository, SeguidorRepositoryImpl>();
 builder.Services.AddScoped<IPublicacaoRepository, PublicacaoRepositoryImpl>();
 builder.Services.AddScoped<IComentarioRepository, ComentarioRepositoryImpl>();
 builder.Services.AddScoped<ICurtidaRepository, CurtidaRepositoryImpl>();
+builder.Services.AddScoped<IFavoritarRepository, FavoritarRepositoryImpl>();
 
 var chaveCriptografia = Encoding.ASCII.GetBytes(ChaveJWT.ChaveSecreta);
 builder.Services.AddAuthentication(auth =>

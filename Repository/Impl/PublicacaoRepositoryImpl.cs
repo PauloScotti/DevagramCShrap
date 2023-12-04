@@ -18,11 +18,13 @@ namespace DevagramCShrap.Repository.Impl
                 from publicacoes in _context.Publicacoes
                 join seguidores in _context.Seguidores on publicacoes.IdUsuario equals seguidores.IdUsuarioSeguido
                 where seguidores.IdUsuarioSeguidor == idUsuario
+                orderby publicacoes.DataPublicacao descending
                 select new PublicacaoFeedRespostaDto
                 {
                     IdPublicacao = publicacoes.Id,
                     Descricao = publicacoes.Descricao,
                     Foto = publicacoes.Foto,
+                    DataPublicacao = publicacoes.DataPublicacao,
                     IdUsuario = publicacoes.IdUsuario,
                 };
 
@@ -34,15 +36,27 @@ namespace DevagramCShrap.Repository.Impl
             var feedusuario = 
                 from publicacoes in _context.Publicacoes
                 where publicacoes.IdUsuario == idUsuario
+                orderby publicacoes.DataPublicacao descending
                 select new PublicacaoFeedRespostaDto
                 {
                     IdPublicacao = publicacoes.Id,
                     Descricao = publicacoes.Descricao,
                     Foto = publicacoes.Foto,
+                    DataPublicacao = publicacoes.DataPublicacao,
                     IdUsuario = publicacoes.IdUsuario,
                 };
 
             return feedusuario.ToList();
+        }
+
+        public Publicacao getQtdePublicacaoId(int idPublicacao)
+        {
+            return _context.Publicacoes.FirstOrDefault(p => p.Id == idPublicacao);
+        }
+
+        public int getQtdePublicacoes(int idUsuario)
+        {
+            return _context.Publicacoes.Count(p => p.IdUsuario == idUsuario);
         }
 
         public void Publicar(Publicacao publicacao)

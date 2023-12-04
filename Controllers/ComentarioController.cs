@@ -35,6 +35,7 @@ namespace DevagramCShrap.Controllers
                     Comentario comentario = new Comentario();
                     comentario.Descricacao = comentarioDto.Descricao;
                     comentario.IdPublicacao = comentarioDto.IdPublicacao;
+                    comentario.DataComentario = DateTime.Now;
                     comentario.IdUsuario = LerToken().Id;
 
                     _comentarioRepository.Comentar(comentario);

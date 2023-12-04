@@ -9,6 +9,8 @@ namespace DevagramCShrap.Models
         public int IdUsuario { get; set; }
         public int IdPublicacao {  get; set; }
 
+        public DateTime DataComentario { get; set; }
+
         [ForeignKey("IdUsuario")]
         public virtual Usuario Usuario { get; private set; }
 
