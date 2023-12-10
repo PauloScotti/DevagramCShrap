@@ -10,5 +10,6 @@ namespace DevagramCShrap.Repository
         int getQtdePublicacoes(int idUsuario);
         Publicacao getQtdePublicacaoId(int idPublicacao);
         public void Publicar(Publicacao publicacao);
+        Publicacao GetPublicacaoId(int idPublicacao);
     }
 }

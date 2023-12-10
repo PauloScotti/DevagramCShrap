@@ -14,11 +14,13 @@ namespace DevagramCShrap.Controllers
         private readonly IPublicacaoRepository _publicacaoRepository;
         private readonly IComentarioRepository _comentarioRepository;
         private readonly ICurtidaRepository _curtidaRepository;
+        private readonly IFavoritarRepository _favoritarRepository;
 
         public PublicacaoController(ILogger<PublicacaoController> logger,
             IPublicacaoRepository publicacaoRepository,
             IUsuarioRepository usuarioRepository,
             IComentarioRepository comentarioRepository,
+            IFavoritarRepository favoritarRepository,
             ICurtidaRepository curtidaRepository
             ) : base(usuarioRepository)
         {
@@ -26,6 +28,7 @@ namespace DevagramCShrap.Controllers
             _publicacaoRepository = publicacaoRepository;
             _comentarioRepository = comentarioRepository;
             _curtidaRepository = curtidaRepository;
+            _favoritarRepository = favoritarRepository;
         }
 
         [HttpPost]
@@ -47,11 +50,13 @@ namespace DevagramCShrap.Controllers
                         _logger.LogError("A foto está inválida");
                         return BadRequest("É obrigatório incluir a foto na publicação");
                     }
+                    string contentType = publicacaoDto.Foto.ContentType;
                     Publicacao publicacao = new Publicacao()
                     {
                         Descricao = publicacaoDto.Descricao,
                         IdUsuario = usuario.Id,
                         DataPublicacao = DateTime.Now,
+                        FileType = publicacaoDto.Foto.ContentType,
                         Foto = cosmicService.EnviarImagem(new ImagemDto { Imagem = publicacaoDto.Foto, Nome = publicacaoDto.Foto.FileName })
                     };
                     _publicacaoRepository.Publicar(publicacao);
@@ -156,11 +161,65 @@ namespace DevagramCShrap.Controllers
         {
             try
             {
-                return Ok(_publicacaoRepository.getQtdePublicacaoId(idPublicacao));
+                return Ok(_publicacaoRepository.GetPublicacaoId(idPublicacao));
             }
             catch (Exception ex)
             {
                 _logger.LogError("Ocorreu um erro ao buscar a publicação");
+                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
+                {
+                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
+
+        [HttpGet]
+        [Route("favoritas")]
+        public IActionResult PesquisarFavoritas()
+        {
+            try
+            {
+                List<Favoritar> favoritas = _favoritarRepository.GetFavoritas(LerToken().Id);
+
+                List<PublicacaoFeedRespostaDto> publicacoes = new List<PublicacaoFeedRespostaDto>();
+
+                foreach (Favoritar favoritar in favoritas)
+                {
+                    Publicacao publicacao = _publicacaoRepository.GetPublicacaoId(favoritar.IdPublicacao);
+                    Usuario usuario = _usuarioRepository.GetUsuarioPorId(favoritar.IdUsuario);
+                    UsuarioRespostaDto usuarioRespostaDto = new UsuarioRespostaDto()
+                    {
+                        Nome = usuario.Nome,
+                        Avatar = usuario.FotoPerfil,
+                        IdUsuario = usuario.Id
+                    };
+
+                    PublicacaoFeedRespostaDto publicacaoFeedRespostaDto = new PublicacaoFeedRespostaDto()
+                    {
+                        Usuario = usuarioRespostaDto,
+                        Descricao = publicacao.Descricao,
+                        Foto = publicacao.Foto,
+                        DataPublicacao = publicacao.DataPublicacao,
+                        FileType = publicacao.FileType,
+                        IdPublicacao = publicacao.Id,
+                        IdUsuario = publicacao.IdUsuario
+                    };
+
+                    List<Comentario> comentarios = _comentarioRepository.GetComentarioPorPublicacao(publicacaoFeedRespostaDto.IdPublicacao);
+                    publicacaoFeedRespostaDto.Comentarios = comentarios;
+
+                    List<Curtida> curtidas = _curtidaRepository.GetCurtidaPorPublicacao(publicacaoFeedRespostaDto.IdPublicacao);
+                    publicacaoFeedRespostaDto.Curtidas = curtidas;
+
+                    publicacoes.Add(publicacaoFeedRespostaDto);
+
+                }
+                return Ok(publicacoes);
+                }
+            catch (Exception ex)
+            {
+                _logger.LogError("Ocorreu um erro ao carregar o feed da home");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
                     Descricao = "Ocorreu o seguinte erro: " + ex.Message,
@@ -196,6 +255,7 @@ namespace DevagramCShrap.Controllers
                         Descricao = publicacaoASerCompartilhada.Descricao,
                         IdUsuario = usuario.Id,
                         DataPublicacao = DateTime.Now,
+                        FileType = publicacaoASerCompartilhada.FileType,
                         Foto = publicacaoASerCompartilhada.Foto
                     };
                     _publicacaoRepository.Publicar(publicacao);

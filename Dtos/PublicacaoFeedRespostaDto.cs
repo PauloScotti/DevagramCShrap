@@ -6,6 +6,7 @@ namespace DevagramCShrap.Dtos
     {
         public int IdPublicacao { get; set; }
         public string Descricao { get; set; }
+        public string FileType { get; set; }
         public string Foto { get; set; }
         public DateTime DataPublicacao { get; set; }
         public int IdUsuario { get; set; }

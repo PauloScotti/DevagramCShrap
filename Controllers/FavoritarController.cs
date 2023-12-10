@@ -74,5 +74,24 @@ namespace DevagramCShrap.Controllers
                 });
             }
         }
+
+        [HttpGet]
+        public IActionResult ListarFavoritas()
+        {
+            try
+            {
+                List<Favoritar> favoritar = _favoritarRepository.GetFavoritas(LerToken().Id);
+                return Ok(favoritar);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Ocorreu um erro ao listar publicações favoritas");
+                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
+                {
+                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Status = StatusCodes.Status500InternalServerError
+                });
+            }
+        }
     }
 }

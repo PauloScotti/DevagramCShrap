@@ -12,6 +12,11 @@ namespace DevagramCShrap.Repository.Impl
             _context = context;
         }
 
+        public Publicacao GetPublicacaoId(int idPublicacao)
+        {
+            return _context.Publicacoes.FirstOrDefault(p => p.Id == idPublicacao);
+        }
+
         public List<PublicacaoFeedRespostaDto> GetPublicacoesFeed(int idUsuario)
         {
             var feed =
@@ -24,6 +29,7 @@ namespace DevagramCShrap.Repository.Impl
                     IdPublicacao = publicacoes.Id,
                     Descricao = publicacoes.Descricao,
                     Foto = publicacoes.Foto,
+                    FileType = publicacoes.FileType,
                     DataPublicacao = publicacoes.DataPublicacao,
                     IdUsuario = publicacoes.IdUsuario,
                 };
@@ -42,6 +48,7 @@ namespace DevagramCShrap.Repository.Impl
                     IdPublicacao = publicacoes.Id,
                     Descricao = publicacoes.Descricao,
                     Foto = publicacoes.Foto,
+                    FileType= publicacoes.FileType,
                     DataPublicacao = publicacoes.DataPublicacao,
                     IdUsuario = publicacoes.IdUsuario,
                 };
