@@ -11,6 +11,7 @@ namespace DevagramCShrap.Controllers
     public class PublicacaoController : BaseController
     {
         private readonly ILogger<PublicacaoController> _logger;
+        private readonly CosmicService _cosmicService;
         private readonly IPublicacaoRepository _publicacaoRepository;
         private readonly IComentarioRepository _comentarioRepository;
         private readonly ICurtidaRepository _curtidaRepository;
@@ -21,9 +22,9 @@ namespace DevagramCShrap.Controllers
             IUsuarioRepository usuarioRepository,
             IComentarioRepository comentarioRepository,
             IFavoritarRepository favoritarRepository,
-            ICurtidaRepository curtidaRepository
-            ) : base(usuarioRepository)
+            ICurtidaRepository curtidaRepository, CosmicService cosmicService) : base(usuarioRepository)
         {
+            _cosmicService = cosmicService;
             _logger = logger;
             _publicacaoRepository = publicacaoRepository;
             _comentarioRepository = comentarioRepository;
@@ -37,7 +38,6 @@ namespace DevagramCShrap.Controllers
             try
             {
                 Usuario usuario = LerToken();
-                CosmicService cosmicService = new CosmicService();
                 if(publicacaoDto != null) {
                     if(String.IsNullOrEmpty(publicacaoDto.Descricao)
                         && String.IsNullOrWhiteSpace(publicacaoDto.Descricao))
@@ -57,19 +57,23 @@ namespace DevagramCShrap.Controllers
                         IdUsuario = usuario.Id,
                         DataPublicacao = DateTime.Now,
                         FileType = publicacaoDto.Foto.ContentType,
-                        Foto = cosmicService.EnviarImagem(new ImagemDto { Imagem = publicacaoDto.Foto, Nome = publicacaoDto.Foto.FileName })
+                        Foto = _cosmicService.EnviarImagem(new ImagemDto { Imagem = publicacaoDto.Foto, Nome = publicacaoDto.Foto.FileName })
                     };
                     _publicacaoRepository.Publicar(publicacao);
                 }
 
                 return Ok("Publicação salva com sucesso!");
             }
+            catch (ImagemInvalidaException ex)
+            {
+                return BadRequest(ex.Message);
+            }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao criar publicação");
+                _logger.LogError(ex, "Ocorreu um erro ao criar publicação");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
@@ -106,10 +110,10 @@ namespace DevagramCShrap.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao carregar o feed da home");
+                _logger.LogError(ex, "Ocorreu um erro ao carregar o feed da home");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
@@ -146,10 +150,10 @@ namespace DevagramCShrap.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao carregar o feed do usuário");
+                _logger.LogError(ex, "Ocorreu um erro ao carregar o feed do usuário");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
@@ -165,10 +169,10 @@ namespace DevagramCShrap.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao buscar a publicação");
+                _logger.LogError(ex, "Ocorreu um erro ao buscar a publicação");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
@@ -219,10 +223,10 @@ namespace DevagramCShrap.Controllers
                 }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao carregar o feed da home");
+                _logger.LogError(ex, "Ocorreu um erro ao carregar o feed da home");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
@@ -265,10 +269,10 @@ namespace DevagramCShrap.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao criar publicação");
+                _logger.LogError(ex, "Ocorreu um erro ao criar publicação");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }

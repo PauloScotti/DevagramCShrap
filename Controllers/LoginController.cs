@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using DevagramCShrap.Dtos;
 using DevagramCShrap.Models;
-using DevagramCShrap.Services;
 using DevagramCShrap.Repository;
+using DevagramCShrap.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DevagramCShrap.Controllers
 {
@@ -13,11 +13,13 @@ namespace DevagramCShrap.Controllers
     {
         private readonly ILogger<LoginController> _logger;
         private readonly IUsuarioRepository _usuarioRepository;
+        private readonly TokenService _tokenService;
 
-        public LoginController(ILogger<LoginController> logger, IUsuarioRepository usuarioRepository)
+        public LoginController(ILogger<LoginController> logger, IUsuarioRepository usuarioRepository, TokenService tokenService)
         {
             _logger = logger;
             _usuarioRepository = usuarioRepository;
+            _tokenService = tokenService;
         }
 
         [HttpPost]
@@ -26,31 +28,7 @@ namespace DevagramCShrap.Controllers
         {
             try
             {
-                if (!String.IsNullOrEmpty(loginrequisicao.Email) && !String.IsNullOrEmpty(loginrequisicao.Senha) && !String.IsNullOrWhiteSpace(loginrequisicao.Email) && !String.IsNullOrWhiteSpace(loginrequisicao.Senha))
-                {
-
-                    Usuario usuario = _usuarioRepository.GetUsuarioPorLoginSenha(loginrequisicao.Email.ToLower(),Utils.MD5Utils.GerarHashMD5(loginrequisicao.Senha));
-
-                        if(usuario != null)
-                    {
-                        return Ok(new LoginRespostaDto()
-                        {
-                            Email = usuario.Email,
-                            Nome = usuario.Nome,
-                            Token = TokenService.CriarToken(usuario)
-                        });
-                    }
-                        else
-                    {
-
-                    }
-                    return BadRequest(new ErrorRespostaDto()
-                    {
-                        Descricao = "Email ou senha inválidos",
-                        Status = StatusCodes.Status400BadRequest
-                    });
-                }
-                else
+                if (string.IsNullOrWhiteSpace(loginrequisicao?.Email) || string.IsNullOrWhiteSpace(loginrequisicao.Senha))
                 {
                     return BadRequest(new ErrorRespostaDto()
                     {
@@ -58,10 +36,38 @@ namespace DevagramCShrap.Controllers
                         Status = StatusCodes.Status400BadRequest
                     });
                 }
+
+                // Mesma resposta para e-mail inexistente e senha errada: não revela
+                // quais e-mails têm conta.
+                Usuario? usuario = _usuarioRepository.GetUsuarioPorEmail(loginrequisicao.Email.ToLower());
+                var (valida, precisaRegravar) = usuario == null
+                    ? (false, false)
+                    : SenhaService.Conferir(loginrequisicao.Senha, usuario.Senha);
+                if (usuario == null || !valida)
+                {
+                    return BadRequest(new ErrorRespostaDto()
+                    {
+                        Descricao = "Email ou senha inválidos",
+                        Status = StatusCodes.Status400BadRequest
+                    });
+                }
+
+                if (precisaRegravar)
+                {
+                    usuario.Senha = SenhaService.GerarHash(loginrequisicao.Senha);
+                    _usuarioRepository.AtualizarUsuario(usuario);
+                }
+
+                return Ok(new LoginRespostaDto()
+                {
+                    Email = usuario.Email,
+                    Nome = usuario.Nome,
+                    Token = _tokenService.CriarToken(usuario)
+                });
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro no login: " + ex.Message);
+                _logger.LogError(ex, "Ocorreu um erro no login");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
                     Descricao = "Ocorreu um erro no login",

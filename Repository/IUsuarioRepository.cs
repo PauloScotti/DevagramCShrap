@@ -4,7 +4,7 @@ namespace DevagramCShrap.Repository
 {
     public interface IUsuarioRepository
     {
-        Usuario GetUsuarioPorLoginSenha(string v1, string v2);
+        Usuario? GetUsuarioPorEmail(string email);
         public void Salvar(Usuario usuario);
 
         public bool VerificarEmail(string email);

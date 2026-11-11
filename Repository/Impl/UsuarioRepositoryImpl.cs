@@ -23,9 +23,9 @@ namespace DevagramCShrap.Repository.Impl
             return _context.Usuarios.FirstOrDefault(u => u.Id == id);
         }
 
-        public Usuario GetUsuarioPorLoginSenha(string email, string senha)
+        public Usuario? GetUsuarioPorEmail(string email)
         {
-            return _context.Usuarios.FirstOrDefault(u => u.Email == email && u.Senha == senha);
+            return _context.Usuarios.FirstOrDefault(u => u.Email == email);
         }
 
         public List<Usuario> GetUsuarioPorNome(string nome)
