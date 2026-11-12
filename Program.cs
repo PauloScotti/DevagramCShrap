@@ -1,18 +1,15 @@
-using DevagramCShrap;
 using DevagramCShrap.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.EntityFrameworkCore;
-using System.Text;
 using DevagramCShrap.Repository;
 using DevagramCShrap.Repository.Impl;
+using DevagramCShrap.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -25,34 +22,38 @@ builder.Services.AddScoped<IPublicacaoRepository, PublicacaoRepositoryImpl>();
 builder.Services.AddScoped<IComentarioRepository, ComentarioRepositoryImpl>();
 builder.Services.AddScoped<ICurtidaRepository, CurtidaRepositoryImpl>();
 builder.Services.AddScoped<IFavoritarRepository, FavoritarRepositoryImpl>();
+builder.Services.AddSingleton<TokenService>();
+builder.Services.AddHttpClient<CosmicService>();
 
-var chaveCriptografia = Encoding.ASCII.GetBytes(ChaveJWT.ChaveSecreta);
+// Falha na subida, e não na primeira requisição, se a chave não estiver configurada.
+var chaveCriptografia = TokenService.LerChave(builder.Configuration);
 builder.Services.AddAuthentication(auth =>
 {
     auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddJwtBearer(autenticacao =>
 {
-    autenticacao.RequireHttpsMetadata = false;
     autenticacao.SaveToken = true;
     autenticacao.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(chaveCriptografia),
+        ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 },
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromMinutes(1),
         ValidateIssuer = false,
         ValidateAudience = false
     };
 });
 
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// Swagger UI em /swagger e referência Scalar em /scalar.
+app.UseSwagger();
+app.UseSwaggerUI();
+app.MapScalarApiReference(opcoes => opcoes
+    .WithTitle("Devagram API")
+    .WithOpenApiRoutePattern("/swagger/{documentName}/swagger.json"));
 
 app.UseHttpsRedirection();
 

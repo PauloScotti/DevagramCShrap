@@ -66,10 +66,10 @@ namespace DevagramCShrap.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao favoritar/desfavoritar a publicação");
+                _logger.LogError(ex, "Ocorreu um erro ao favoritar/desfavoritar a publicação");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
@@ -85,10 +85,10 @@ namespace DevagramCShrap.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao listar publicações favoritas");
+                _logger.LogError(ex, "Ocorreu um erro ao listar publicações favoritas");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }

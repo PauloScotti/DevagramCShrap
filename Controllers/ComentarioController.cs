@@ -45,10 +45,10 @@ namespace DevagramCShrap.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError("Ocorreu um erro ao comentar");
+                _logger.LogError(ex, "Ocorreu um erro ao comentar");
                 return StatusCode(StatusCodes.Status500InternalServerError, new ErrorRespostaDto()
                 {
-                    Descricao = "Ocorreu o seguinte erro: " + ex.Message,
+                    Descricao = "Ocorreu um erro interno",
                     Status = StatusCodes.Status500InternalServerError
                 });
             }
